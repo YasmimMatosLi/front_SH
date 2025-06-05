@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/styles_cadm.css"/>
+  <title>Cadastro de Admin</title>
+</head>
+<body>
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+  </div>
+  <div id="register-message"></div>
+    <div class="main-content">
+  <h1>Cadastro de Administrador</h1>
+  <form id="adminForm">
+    
+    <h2>Informações Pessoais</h2>
+    <div class="form-section">
+      <label>
+        Nome
+        <input type="text" name="nome" required />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" required />
+      </label>
+
+      <label>
+        Senha (mínimo 8 caracteres)
+        <input type="password" name="password" minlength="8" required />
+      </label>
+
+      <label>
+        CPF
+        <input type="text" name="cpf" required />
+      </label>
+
+      <label>
+        CNS
+        <input type="text" name="cns" required />
+      </label>
+
+      <label>
+        Data de Nascimento
+        <input type="date" name="dataNascimento" required />
+      </label>
+
+      <label>
+        Sexo
+        <select name="sexo" required>
+          <option value="">Selecione</option>
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMININO">Feminino</option>
+          <option value="OUTRO">Outro</option>
+        </select>
+      </label>
+
+      <label>
+        Raça/Cor
+        <select name="racaCor" required>
+          <option value="">Selecione</option>
+          <option value="BRANCA">Branca</option>
+          <option value="PARDA">Parda</option>
+          <option value="PRETA">Preta</option>
+          <option value="AMARELA">Amarela</option>
+          <option value="INDÍGENA">Indígena</option>
+        </select>
+      </label>
+
+      <label>
+        Escolaridade
+        <select name="escolaridade" required>
+          <option value="">Selecione</option>
+          <option value="FUNDAMENTAL">Fundamental</option>
+          <option value="MEDIO">Médio</option>
+          <option value="SUPERIOR">Superior</option>
+          <option value="PÓS-GRADUAÇÃO">Pós-graduação</option>
+        </select>
+      </label>
+
+      <label>
+        Telefone
+        <input type="text" name="telefone" required />
+      </label>
+
+      <label>
+        Chave Secreta do Admin
+        <input type="text" name="adminSecret" required />
+      </label>
+    </div>
+
+    <h2>Endereço</h2>
+    <div class="form-section">
+      <label>
+        Logradouro
+        <input type="text" name="logradouro" required />
+      </label>
+
+      <label>
+        Número
+        <input type="text" name="numero" required />
+      </label>
+
+      <label>
+        Bairro
+        <input type="text" name="bairro" required />
+      </label>
+
+      <label>
+        Cidade
+        <input type="text" name="cidade" required />
+      </label>
+
+      <label>
+        Estado
+        <input type="text" name="estado" required />
+      </label>
+
+      <label>
+        CEP
+        <input type="text" name="cep" required />
+      </label>
+    </div>
+
+    <button type="submit">Cadastrar</button>
+  </form>
+</div>
+
+
+  <script src="js/register-admin.js"></script>
+</body>
+</html>
+

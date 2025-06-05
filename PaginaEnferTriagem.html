@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles_adm.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"/>
+    <title>Sistema Hospitalar</title>
+</head>
+<body>
+    <section class="header">
+        <div class="logo">
+            <i class="ri-menu-line icon icon-0 menu"></i>
+            <h2>Sistema <span>Hospitalar</span></h2>
+        </div>
+        <div class="search--notification--profile">
+            <div class="search">
+                <!--<input type="text" placeholder="Search">
+                <button><i class="ri-search-line"></i></button>-->
+            </div>
+            <div class="notification--profile">
+                <!--<div class="picon lock">
+                    <i class="ri-lock-line"></i>
+                </div>
+                <div class="picon bell">
+                    <i class="ri-notification-2-line"></i>
+                </div>
+                <div class="picon chat">
+                    <i class="ri-wechat-2-line"></i>
+                </div>-->
+                <div class="picon profile">
+                    <a href=""><img src="imgs/_no avatar pfp user_ version png transparent.jfif" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="main">
+        <div class="sidebar">
+            <ul class="sidebar--items">
+                <li>
+                    <a href="PaginaEnfermeiro.html" id="active--link">
+                        <span class="icon icon-1"><i class="ri-layout-grid-line"></i></span>
+                        <span class="sidebar--item">Painel</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="PaginaEnferPacientes.html">
+                        <span class="icon icon-4"><i class="ri-user-line"></i></span>
+                        <span class="sidebar--item">Pacientes</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="PaginaEnferTriagem.html">
+                        <span class="icon icon-6"><i class="ri-stethoscope-line"></i></span>
+                        <span class="sidebar--item">Triagem</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="sidebar--bottom-items">
+                <li>
+                    <a href="index.html">
+                        <span class="icon icon-8"><i class="ri-logout-box-r-line"></i></span>
+                        <span class="sidebar--item">Sair</span>
+                    </a>
+                </li>
+            </ul>
+            
+        </div>
+        <div class="main-content">
+            <div class="header-triagem">
+    <h2>Triagens Realizadas</h2>
+    <button class="adicionar" onclick="window.location.href='PaginaEnferTriagemCriar.html'">+ Adicionar Triagem</button>
+  </div>
+
+  
+    <div class="tabela-container">
+  <table class="tabela-triagens">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Paciente</th>
+        <th>Data</th>
+        <th>Pressão</th>
+        <th>Temperatura</th>
+        <th>Peso</th>
+        <th>Observações</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>f755fed0-a3fa-44d6-9462-66f4e7dc68bf</th>
+            <th>eae1875a-e6f2-4288-ac04-0a9d8b952053</th>
+            <th>04/06/2025</th>
+            <th>120/80</th>
+            <th>38</th>
+            <th>59</th>
+            <th>febre alta</th>
+            <th>
+                <button class="btn-view">Ver</button>
+                <button class="btn-edit">Editar</button>
+                <button class="btn-delete">Excluir</button>
+            </th>
+        </tr>
+    </tbody>
+  </table>
+</div>
+  
+            
+
+    <script src="js/enfer.js"></script>
+</body>
+</html>

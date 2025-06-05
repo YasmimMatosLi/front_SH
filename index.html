@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <title>Sistema Hospitalar</title>
 </head>
 <body>
+    <div id="loadingScreen" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    
     <div class="container-login">
         <div class="img-box">
             <img src="imgs/undraw_medicine_hqqg.png" alt="">
@@ -15,17 +19,18 @@
         
         <div class="content-box">
             <div class="form-box">
-                <h2>Login</h2>
-                <form>
+                <h2>Login<br>Sistema Hospitalar
+                </h2>
+                <form id="loginForm">
                     <!--Email-->
                     <div class="input-box">
                         <span>Email</span>
-                        <input type="email" placeholder="@gmail.com">
+                        <input type="email" id="email" placeholder="@gmail.com" required>
                     </div>
                     <!--Senha-->
                     <div class="input-box">
                         <span>Senha</span>
-                        <input type="password" placeholder="Senha">
+                        <input type="password" id="senha" placeholder="Senha" required>
                     </div>
                     <div class="input-box">
                         <input type="submit" value="Entrar">
@@ -34,5 +39,8 @@
             </div>
         </div>
     </div>
+    <div id="login-message"></div>
+
+    <script src="js/scriptlogin.js"></script>
 </body>
 </html>
