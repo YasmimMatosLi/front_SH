@@ -428,321 +428,20 @@ document.addEventListener('DOMContentLoaded', () => {
 //ver os dados da triagem
 
 document.addEventListener('DOMContentLoaded', () => {
-  const API_BASE_URL = 'https://sistema-hospitalar.onrender.com/api';
-  const triagemTableBody = document.querySelector('.tabela-triagens tbody');
+  console.log('enfer.js loaded'); // Debug to confirm script runs once
 
-  if (!triagemTableBody) {
-    console.error('Erro: Elemento .tabela-triagens tbody não encontrado no DOM.');
-    //showModal('Erro: Tabela de triagens não encontrada na página.', true);
-    return;
-  }
-
-  // Função para exibir modal de mensagem ou detalhes
-  function showModal(message, isError = false) {
-    let modal = document.getElementById('customModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'customModal';
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-      modal.style.display = 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-      modal.style.zIndex = '1000';
-      document.body.appendChild(modal);
-    }
-
-    modal.innerHTML = `
-      <div style="background-color: white; padding: 20px; border-radius: 8px; text-align: left; max-width: 500px; max-height: 80vh; overflow-y: auto;">
-        <p id="modalMessage" style="margin: 0 0 15px 0; color: ${isError ? '#d32f2f' : '#2e7d32'};">${message}</p>
-        <button id="closeModal" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Fechar</button>
-      </div>
-    `;
-
-    modal.style.display = 'flex';
-    modal.querySelector('div').style.backgroundColor = isError ? '#ffe6e6' : '#e6ffe6';
-
-    const closeButton = modal.querySelector('#closeModal');
-    closeButton.onclick = () => modal.style.display = 'none';
-    modal.onclick = (event) => {
-      if (event.target === modal) modal.style.display = 'none';
-    };
-  }
-
-  // Função para formatar a pressão arterial
-  function formatarPressao(sistolica, diastolica) {
-    return sistolica && diastolica ? `${sistolica}/${diastolica} mmHg` : 'N/A';
-  }
-
-  // Função para formatar a data
-  function formatarData(data) {
-    if (!data) return 'N/A';
-    const date = new Date(data);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  }
-
-  // Função para listar triagens usando IDs individuais
-  async function listarTriagens() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showModal('Erro: Você precisa estar logado. Faça login novamente.', true);
-      setTimeout(() => window.location.href = 'index.html', 2000);
-      return;
-    }
-
-    // Substitua com IDs de triagem válidos
-    const triagemIds = ['<id1>', '<id2>', '<id3>']; // Forneça IDs reais aqui
-    const triagens = [];
-
-    for (const id of triagemIds) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/triagens/${id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const contentType = response.headers.get('Content-Type');
-          if (!contentType || !contentType.includes('application/json')) {
-            throw new Error(`Resposta para triagem ${id} não é JSON válido.`);
-          }
-          const triagem = await response.json();
-          triagens.push(triagem);
-        } else {
-          const contentType = response.headers.get('Content-Type');
-          let errorMessage = response.statusText;
-          if (contentType && contentType.includes('application/json')) {
-            const errorData = await response.json();
-            errorMessage = errorData.message || response.statusText;
-          }
-          console.warn(`Erro ao buscar triagem ${id} (Status ${response.status}):`, errorMessage);
-        }
-      } catch (error) {
-        console.error(`Erro ao buscar triagem ${id}:`, error);
-      }
-    }
-
-    if (triagens.length === 0) {
-      showModal('Nenhuma triagem encontrada. Forneça IDs válidos ou verifique o endpoint.', false);
-      triagemTableBody.innerHTML = '';
-      return;
-    }
-
-    preencherTabela(triagens);
-  }
-
-  // Função para preencher a tabela com triagens
-  function preencherTabela(triagens) {
-    triagemTableBody.innerHTML = '';
-    triagens.forEach(triagem => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${triagem.id || 'N/A'}</td>
-        <td>${triagem.paciente?.nome || 'N/A'}</td>
-        <td>${formatarData(triagem.dataTriagem)}</td>
-        <td>${formatarPressao(triagem.sinaisVitais?.pressaoArterialSistolica, triagem.sinaisVitais?.pressaoArterialDiastolica)}</td>
-        <td>${triagem.sinaisVitais?.temperatura ? `${triagem.sinaisVitais.temperatura} °C` : 'N/A'}</td>
-        <td>${triagem.peso ? `${triagem.peso} kg` : 'N/A'}</td>
-        <td>${triagem.queixaPrincipal || 'N/A'}</td>
-        <td>
-          <button class="btn-view" data-id="${triagem.id}">Ver</button>
-          <button class="btn-edit" data-id="${triagem.id}">Editar</button>
-          <button class="btn-delete" data-id="${triagem.id}">Excluir</button>
-        </td>
-      `;
-      triagemTableBody.appendChild(tr);
-    });
-
-    // Adiciona eventos aos botões com verificação
-    const viewButtons = document.querySelectorAll('.btn-view');
-    if (viewButtons.length > 0) {
-      viewButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const triagemId = button.getAttribute('data-id');
-          mostrarDetalhesTriagem(triagemId);
-        });
-      });
-    } else {
-      console.warn('Nenhum botão .btn-view encontrado.');
-    }
-
-    const editButtons = document.querySelectorAll('.btn-edit');
-    if (editButtons.length > 0) {
-      editButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          showModal('Funcionalidade de edição ainda não implementada.', true);
-        });
-      });
-    } else {
-      console.warn('Nenhum botão .btn-edit encontrado.');
-    }
-
-    const deleteButtons = document.querySelectorAll('.btn-delete');
-    if (deleteButtons.length > 0) {
-      deleteButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          showModal('Funcionalidade de exclusão ainda não implementada.', true);
-        });
-      });
-    } else {
-      console.warn('Nenhum botão .btn-delete encontrado.');
-    }
-  }
-
-  // Função para buscar detalhes de uma triagem específica
-async function mostrarDetalhesTriagem(triagemId) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    showModal('Erro: Você precisa estar logado. Faça login novamente.', true);
-    setTimeout(() => window.location.href = 'index.html', 2000);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/triagens/${triagemId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const contentType = response.headers.get('Content-Type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Resposta não é JSON válido.');
-      }
-
-      const triagem = await response.json();
-      const detalhes = `
-        <h3>Detalhes da Triagem</h3>
-        <p><strong>ID:</strong> ${triagem.id || 'N/A'}</p>
-        <p><strong>Paciente:</strong> ${triagem.paciente?.nome || 'N/A'}</p>
-        <p><strong>Data:</strong> ${formatarData(triagem.dataTriagem)}</p>
-        <p><strong>Pressão Arterial:</strong> ${formatarPressao(triagem.sinaisVitais?.pressaoArterialSistolica, triagem.sinaisVitais?.pressaoArterialDiastolica)}</p>
-        <p><strong>Temperatura:</strong> ${triagem.sinaisVitais?.temperatura ? `${triagem.sinaisVitais.temperatura} °C` : 'N/A'}</p>
-        <p><strong>Frequência Cardíaca:</strong> ${triagem.sinaisVitais?.frequenciaCardiaca ? `${triagem.sinaisVitais.frequenciaCardiaca} bpm` : 'N/A'}</p>
-        <p><strong>Frequência Respiratória:</strong> ${triagem.sinaisVitais?.frequenciaRespiratoria ? `${triagem.sinaisVitais.frequenciaRespiratoria} rpm` : 'N/A'}</p>
-        <p><strong>Saturação de Oxigênio:</strong> ${triagem.sinaisVitais?.saturacaoOxigenio ? `${triagem.sinaisVitais.saturacaoOxigenio}%` : 'N/A'}</p>
-        <p><strong>Nível de Dor:</strong> ${triagem.sinaisVitais?.nivelDor ?? 'N/A'}</p>
-        <p><strong>Estado Consciente:</strong> ${triagem.sinaisVitais?.estadoConsciente ? 'Sim' : 'Não'}</p>
-        <p><strong>Peso:</strong> ${triagem.peso ? `${triagem.peso} kg` : 'N/A'}</p>
-        <p><strong>Queixa Principal:</strong> ${triagem.queixaPrincipal || 'N/A'}</p>
-        <p><strong>Unidade de Saúde ID:</strong> ${triagem.unidadeSaudeId || 'N/A'}</p>
-        <p><strong>Enfermeiro ID:</strong> ${triagem.enfermeiroId || 'N/A'}</p>
-      `;
-      showModal(detalhes, false);
-    } else {
-      const contentType = response.headers.get('Content-Type');
-      let errorMessage = response.statusText;
-      if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json();
-        errorMessage = errorData.message || response.statusText;
-      }
-      console.error(`Erro ao buscar triagem ${triagemId} (Status ${response.status}):`, errorMessage);
-      showModal(`Erro ao buscar triagem: ${errorMessage}`, true);
-    }
-  } catch (error) {
-    console.error('Erro ao buscar detalhes da triagem:', error);
-    showModal(`Erro ao buscar detalhes da triagem: ${error.message || 'Tente novamente.'}`, true);
-  }
-}
-
-// Função para listar triagens
-async function listarTriagens() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    showModal('Erro: Você precisa estar logado. Faça login novamente.', true);
-    setTimeout(() => window.location.href = 'index.html', 2000);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/triagens/pacientes/63498562-d037-403d-89ce-9e970070e025`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
-    const triagens = await response.json();
-    console.log('Dados das triagens:', triagens);
-    preencherTabela(triagens);
-  } catch (error) {
-    console.error('Erro ao buscar triagens:', error);
-    showModal('Não foi possível carregar as triagens. Verifique a rede ou o token.', true);
-  }
-}
-
-// Função para preencher a tabela com os dados
-function preencherTabela(triagens) {
-  const tabela = document.querySelector('.tabela-triagens');
-  if (!tabela) {
-    console.error('Tabela .tabela-triagens não encontrada no DOM.');
-    showModal('Erro: Tabela de triagens não encontrada.', true);
-    return;
-  }
-
-  const tbody = tabela.querySelector('tbody');
-  if (!tbody) {
-    console.error('Elemento tbody não encontrado na tabela.');
-    showModal('Erro: Estrutura da tabela inválida.', true);
-    return;
-  }
-
-  // Limpa o conteúdo existente
-  tbody.innerHTML = '';
-
-  // Preenche a tabela com os dados
-  triagens.forEach(triagem => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${triagem.id || 'N/A'}</td>
-      <td>${triagem.paciente?.nome || 'N/A'}</td>
-      <td>${formatarData(triagem.dataTriagem)}</td>
-      <td>${formatarPressao(triagem.sinaisVitais?.pressaoArterialSistolica, triagem.sinaisVitais?.pressaoArterialDiastolica)}</td>
-      <td>${triagem.sinaisVitais?.temperatura ? `${triagem.sinaisVitais.temperatura} °C` : 'N/A'}</td>
-      <td>${triagem.peso ? `${triagem.peso} kg` : 'N/A'}</td>
-      <td>${triagem.queixaPrincipal || 'N/A'}</td>
-      <td>
-        <button class="detalhes" onclick="mostrarDetalhesTriagem('${triagem.id}')">Detalhes</button>
-        <button class="editar" onclick="editarTriagem('${triagem.id}')">Editar</button>
-        <button class="excluir" onclick="excluirTriagem('${triagem.id}')">Excluir</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// Funções para editar e excluir triagem
-window.editarTriagem = function (id) {
-  window.location.href = `PaginaEnferTriagemEditar.html?id=${id}`;
-};
-
-window.excluirTriagem = async function (id) {
-  if (confirm('Tem certeza que deseja excluir esta triagem?')) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showModal('Erro: Você precisa estar logado. Faça login novamente.', true);
-      setTimeout(() => window.location.href = 'index.html', 2000);
-      return;
-    }
-
+  // Function to fetch triagens from the API
+  async function fetchTriagens() {
     try {
-      const response = await fetch(`${API_BASE_URL}/triagens/${id}`, {
-        method: 'DELETE',
+      const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+      if (!token) {
+        console.error('No authentication token found');
+        alert('Por favor, faça login para acessar as triagens.');
+        return;
+      }
+
+      const response = await fetch('https://sistema-hospitalar.onrender.com/api', {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -750,31 +449,89 @@ window.excluirTriagem = async function (id) {
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao excluir triagem: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      showModal('Triagem excluída com sucesso!');
-      listarTriagens(); // Recarrega a tabela
+      const triagens = await response.json();
+      populateTable(triagens);
     } catch (error) {
-      console.error('Erro ao excluir triagem:', error);
-      showModal('Erro ao excluir triagem: Tente novamente.', true);
+      console.error('Error fetching triagens:', error);
+      alert('Erro ao carregar triagens. Verifique o console para detalhes.');
     }
   }
-};
 
-// Aguarda o DOM estar completamente carregado
-document.addEventListener('DOMContentLoaded', () => {
-  // Verifica se o botão de adicionar triagem existe
-  const botaoAdicionar = document.querySelector('.adicionar');
-  if (botaoAdicionar) {
-    botaoAdicionar.addEventListener('click', () => {
-      window.location.href = 'PaginaEnferTriagemCriar.html';
+  // Function to populate the table with triagem data
+  function populateTable(triagens) {
+    const tbody = document.getElementById('triagens-tbody');
+    if (!tbody) {
+      console.error('Table body element not found');
+      return;
+    }
+
+    // Clear existing rows
+    tbody.innerHTML = '';
+
+    // Check if triagens is an array and not empty
+    if (!Array.isArray(triagens) || triagens.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8">Nenhuma triagem encontrada</td></tr>';
+      return;
+    }
+
+    // Iterate over triagens and create table rows
+    triagens.forEach(triagem => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${triagem.id}</td>
+        <td>${triagem.pacienteId}</td>
+        <td>${new Date(triagem.data).toLocaleDateString('pt-BR')}</td>
+        <td>${triagem.pressao}</td>
+        <td>${triagem.temperatura}</td>
+        <td>${triagem.peso}</td>
+        <td>${triagem.observacoes}</td>
+        <td>
+          <button class="btn-view" onclick="viewTriagem('${triagem.id}')">Ver</button>
+          <button class="btn-edit" onclick="editTriagem('${triagem.id}')">Editar</button>
+          <button class="btn-delete" onclick="deleteTriagem('${triagem.id}')">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-  } else {
-    console.warn('Botão .adicionar não encontrado no DOM.');
   }
 
-  // Carrega a lista de triagens
-  listarTriagens();
+  // Placeholder functions for action buttons
+  function viewTriagem(id) {
+    window.location.href = `PaginaEnferTriagemDetalhe.html?id=${id}`;
+  }
+
+  function editTriagem(id) {
+    window.location.href = `PaginaEnferTriagemEditar.html?id=${id}`;
+  }
+
+  async function deleteTriagem(id) {
+    if (confirm('Tem certeza que deseja excluir esta triagem?')) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`https://sistema-hospitalar.onrender.com/api/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('Triagem excluída com sucesso!');
+          fetchTriagens(); // Refresh the table
+        } else {
+          throw new Error('Erro ao excluir triagem');
+        }
+      } catch (error) {
+        console.error('Error deleting triagem:', error);
+        alert('Erro ao excluir triagem. Verifique o console para detalhes.');
+      }
+    }
+  }
+
+  // Fetch triagens when the page loads
+  fetchTriagens();
 });
-})
