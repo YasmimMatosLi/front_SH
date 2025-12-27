@@ -2,12 +2,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
     Home, Users, Stethoscope, Activity, FileText, Building2, Brain, LogOut, UserPlus, Pill, ClipboardList
 } from 'lucide-react';
 import { Papeis } from '@/types';
-import {logoutAction} from "@/lib/auth";
+import { logoutAction } from "@/lib/auth";
+import {useQueryClient} from "@tanstack/react-query";
 
 const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home, roles: ['ADMINISTRADOR_PRINCIPAL', 'MEDICO', 'ENFERMEIRO'] },
@@ -28,7 +30,26 @@ interface SidebarProps {
 }
 
 export function Sidebar({ role, currentPath }: SidebarProps) {
+    const router = useRouter();
+    const queryClient = useQueryClient();
     const filteredItems = menuItems.filter(item => item.roles.includes(role));
+
+    const handleLogout = async () => {
+        try {
+            // 1. Chama o server action para deletar cookies
+            await logoutAction();
+
+            // 2. Limpa TODO o cache do React Query
+            queryClient.clear();
+
+            // 3. Força reload completo da página
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Erro no logout:', error);
+            // Mesmo se der erro, força o reload
+            window.location.href = '/login';
+        }
+    };
 
     return (
         <aside className="w-64 bg-gradient-to-b from-blue-900 to-blue-950 text-white flex flex-col h-screen">
@@ -73,9 +94,7 @@ export function Sidebar({ role, currentPath }: SidebarProps) {
 
             <div className="p-4 border-t border-blue-800">
                 <button
-                    onClick={async () => {
-                        await logoutAction(); // chama o Server Action
-                    }}
+                    onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-800/50 text-blue-100 transition-all"
                 >
                     <LogOut className="w-5 h-5" />

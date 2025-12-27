@@ -1,10 +1,10 @@
+// src/lib/auth.ts
 'use server';
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import {LoginResponse, Papeis} from '@/types';
+import { LoginResponse, Papeis } from '@/types';
 
-// src/lib/auth.ts
 export async function loginAction(formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -17,13 +17,17 @@ export async function loginAction(formData: FormData) {
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Credenciais inválidas');
+        redirect(`/login?error=${encodeURIComponent(error.error || 'Credenciais inválidas')}`);
     }
 
     const result: LoginResponse = await response.json();
-
     const cookieStore = await cookies();
 
+    // Deleta cookies antigos primeiro
+    cookieStore.delete('access_token');
+    cookieStore.delete('user_role');
+
+    // Define novos cookies
     cookieStore.set('access_token', result.access_token, {
         httpOnly: false,
         sameSite: 'lax',
@@ -32,9 +36,10 @@ export async function loginAction(formData: FormData) {
     });
 
     cookieStore.set('user_role', result.papel, {
-        sameSite: 'strict',
-        maxAge: result.expires_in || 3600,
+        httpOnly: false,
+        sameSite: 'lax',
         path: '/',
+        maxAge: result.expires_in || 3600,
     });
 
     redirect('/dashboard');
@@ -64,5 +69,5 @@ export async function logoutAction() {
     const cookieStore = await cookies();
     cookieStore.delete('access_token');
     cookieStore.delete('user_role');
-    redirect('/login');
+    redirect('/login?success=Logout realizado com sucesso');
 }
