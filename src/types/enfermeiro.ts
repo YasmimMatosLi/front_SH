@@ -14,6 +14,6 @@ export interface Enfermeiro {
     endereco: Endereco;
     telefone: string;
     email?: string;
-    coren: string;
+    registroProfissional: string;
     dataContratacao: string;
 }

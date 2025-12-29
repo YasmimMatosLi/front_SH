@@ -44,7 +44,7 @@ export default function EnfermeiroDetalhesPage({ params }: Props) {
                     <CardContent className="space-y-4">
                         <div>
                             <p className="text-sm text-muted-foreground">COREN</p>
-                            <p className="font-medium">{enfermeiro.coren}</p>
+                            <p className="font-medium">{enfermeiro.registroProfissional}</p>
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">Data de Contratação</p>

@@ -44,7 +44,7 @@ export default function EditarEnfermeiroPage({ params }: { params: { id: string 
         if (enfermeiro) {
             form.reset({
                 nome: enfermeiro.nome,
-                coren: enfermeiro.coren,
+                coren: enfermeiro.registroProfissional,
                 dataContratacao: new Date(enfermeiro.dataContratacao).toISOString().split('T')[0],
             });
         }
