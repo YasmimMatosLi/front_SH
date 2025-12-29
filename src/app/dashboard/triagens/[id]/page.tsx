@@ -86,7 +86,7 @@ export default function TriagemDetalhesPage({ params }: Props) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="font-medium">{formatDate(triagem.createdAt)}</p>
+                        <p className="font-medium">{formatDate(triagem.data_triagem)}</p>
                     </CardContent>
                 </Card>
             </div>

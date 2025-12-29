@@ -49,7 +49,7 @@ export default function ConsultaDetalhesPage({ params }: Props) {
                     <CardContent className="space-y-4">
                         <div>
                             <p className="text-sm text-muted-foreground">Data</p>
-                            <p className="font-medium">{formatDate(consulta.data)}</p>
+                            <p className="font-medium">{formatDate(consulta.data_consulta)}</p>
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">CID-10</p>

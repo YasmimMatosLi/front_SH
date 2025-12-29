@@ -110,7 +110,7 @@ export default function EditarTriagemPage({ params }: { params: { id: string } }
                     <div className="mb-6 space-y-2">
                         <p><strong>Paciente:</strong> {triagem.paciente_nome}</p>
                         <p><strong>Enfermeiro:</strong> {triagem.enfermeiro_nome}</p>
-                        <p><strong>Data:</strong> {formatDate(triagem.createdAt)}</p>
+                        <p><strong>Data:</strong> {formatDate(triagem.data_triagem)}</p>
                     </div>
 
                     <Form {...form}>

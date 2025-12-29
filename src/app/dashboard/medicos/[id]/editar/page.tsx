@@ -36,7 +36,7 @@ export default function EditarMedicoPage({ params }: { params: { id: string } })
         if (medico) {
             form.reset({
                 nome: medico.nome,
-                crm: medico.crm,
+                crm: medico.registroProfissional,
             });
         }
     }, [medico, form]);

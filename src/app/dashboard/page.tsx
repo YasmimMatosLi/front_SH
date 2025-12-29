@@ -20,7 +20,7 @@ export default function DashboardPage() {
 
     const totalPacientes = pacientes?.length ?? 0;
     const consultasHoje = consultas?.filter(c => {
-        const dataConsulta = new Date(c.data);
+        const dataConsulta = new Date(c.data_consulta);
         const hoje = new Date();
         return dataConsulta.toDateString() === hoje.toDateString();
     }).length ?? 0;

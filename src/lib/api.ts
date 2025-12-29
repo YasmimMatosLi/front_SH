@@ -1,14 +1,29 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+// src/lib/api.ts
+const API_URL = process.env.API_BASE_URL ?? 'http://localhost:3000/api';
+
+if (!API_URL) {
+    throw new Error('API_BASE_URL não definida');
+}
 
 export async function apiFetch<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { public?: boolean } = {}
 ): Promise<T> {
+    let token: string | undefined;
 
-    const token = document.cookie
-        .split('; ')
-        .find(c => c.startsWith('access_token='))
-        ?.split('=')[1];
+    if (!options.public) {
+        if (typeof document === 'undefined') {
+            // Server-side
+            const { cookies } = await import('next/headers');
+            token = (await cookies()).get('access_token')?.value;
+        } else {
+            // Client-side
+            token = document.cookie
+                .split('; ')
+                .find(c => c.startsWith('access_token='))
+                ?.split('=')[1];
+        }
+    }
 
     const res = await fetch(`${API_URL}${endpoint}`, {
         ...options,
@@ -19,8 +34,10 @@ export async function apiFetch<T>(
         },
     });
 
-    if (res.status === 401) {
-        window.location.href = '/login';
+    if (res.status === 401 && !options.public) {
+        if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+        }
         throw new Error('Não autenticado');
     }
 
