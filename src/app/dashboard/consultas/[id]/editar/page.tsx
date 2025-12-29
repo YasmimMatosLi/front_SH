@@ -74,7 +74,7 @@ export default function EditarConsultaPage({ params }: { params: { id: string } 
                     <div className="mb-6 space-y-2">
                         <p><strong>Paciente:</strong> {consulta.pacienteNome}</p>
                         <p><strong>Médico:</strong> {consulta.medicoNome}</p>
-                        <p><strong>Data:</strong> {formatDate(consulta.data)}</p>
+                        <p><strong>Data:</strong> {formatDate(consulta.data_consulta)}</p>
                     </div>
 
                     <Form {...form}>

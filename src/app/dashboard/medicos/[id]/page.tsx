@@ -44,7 +44,7 @@ export default function MedicoDetalhesPage({ params }: Props) {
                     <CardContent className="space-y-4">
                         <div>
                             <p className="text-sm text-muted-foreground">CRM</p>
-                            <p className="font-medium">{medico.crm}</p>
+                            <p className="font-medium">{medico.registroProfissional}</p>
                         </div>
                     </CardContent>
                 </Card>

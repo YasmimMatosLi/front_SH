@@ -15,11 +15,12 @@ export const authService = {
             body: JSON.stringify(data),
         }) as Promise<any>,
 
-    forgotPassword: (email: string): Promise<void> =>
+    forgotPassword: (email: string): Promise<any> =>
         apiFetch('/auth/forgot-password', {
             method: 'POST',
             body: JSON.stringify({ email }),
-        }) as Promise<void>,
+            public: true,
+        }) as Promise<any>,
 
     logout: (): Promise<void> =>
         apiFetch('/auth/logout', { method: 'POST' }).catch(() => {}) as Promise<void>,
