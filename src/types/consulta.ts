@@ -8,6 +8,6 @@ export interface Consulta {
     data_consulta: string;
     observacoes: string;
     cid10?: string | null;
-    pacienteNome?: string;
+    paciente_nome?: string;
     medicoNome?: string;
 }
