@@ -1,15 +1,9 @@
 import type { Metadata } from 'next';
 import {ReactNode} from "react";
 
-type Props = {
-    params: { id: string };
-};
-
-export async function generateMetadata(
-    { params }: Props,
-): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
     return {
-        title: `Paciente #${params.id} - Hospital IA`,
+        title: `Paciente - Hospital IA`,
     };
 }
 

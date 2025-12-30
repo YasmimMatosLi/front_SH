@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
     title: 'Pacientes - Hospital IA',
-    description: 'Gerencie os dados e histórico dos pacientes',
+    description: 'Gerencie os dados dos pacientes',
 };
 
 export default function PacientesLayout({ children }: { children: ReactNode }) {

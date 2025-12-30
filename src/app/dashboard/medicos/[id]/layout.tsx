@@ -1,18 +1,12 @@
 import type { Metadata } from 'next';
-import {ReactNode} from "react";
 
-type Props = {
-    params: { id: string };
-};
-
-export async function generateMetadata(
-    { params }: Props,
-): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
     return {
-        title: `Medico #${params.id} - Hospital IA`,
+        title: `Médico - Hospital IA`,
+        description: `Gerencie os dados dos médicos`,
     };
 }
 
-export default function MedicoLayout({ children }: { children: ReactNode }) {
+export default function MedicoLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }

@@ -1,219 +1,138 @@
-// src/app/dashboard/pacientes/[id]/page.tsx
-import { usePaciente, usePacienteHistorico } from '@/hooks/usePaciente';
+'use client';
+
+import { Header } from '@/components/Header';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { formatCPF, formatTelefone, formatDate } from '@/lib/utils';
-import { Phone, Mail, MapPin, Activity, FileText } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { usePaciente } from '@/hooks/usePaciente';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import {Papeis} from "@/types";
-import {RequireRole} from "@/components/RequireRole";
+import { ArrowLeft, Edit } from 'lucide-react';
+import { formatCPF, formatTelefone, formatDate } from '@/lib/utils';
 
-type Props = {
-    params: { id: string };
-};
+export default function PacienteDetalhesPage() {
+    const params = useParams();
+    const id = params.id as string;
 
-export default function PacienteDetalhesPage({ params }: Props) {
-    const { data: paciente, isLoading: loadingPaciente } = usePaciente(params.id);
-    const { data: historico, isLoading: loadingHistorico } = usePacienteHistorico(params.id);
+    const { data: paciente, isLoading, isError } = usePaciente(id);
 
-    if (loadingPaciente || loadingHistorico) return <LoadingSpinner />;
-
-    if (!paciente) return <div>Paciente não encontrado</div>;
-
-    return (
-        <RequireRole allowedRoles={[Papeis.ADMINISTRADOR_PRINCIPAL, Papeis.MEDICO, Papeis.ENFERMEIRO]}>
-            <div className="space-y-8">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h1 className="text-3xl font-bold">{paciente.nome}</h1>
-                        <p className="text-muted-foreground mt-2">Detalhes e histórico completo</p>
-                    </div>
-                    <Link href={`/dashboard/pacientes/${paciente.id}/editar`}>
-                        <Button>Editar Paciente</Button>
-                    </Link>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Dados Pessoais */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <FileText className="w-5 h-5" />
-                                Dados Pessoais
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">CPF</p>
-                                <p className="font-medium">{formatCPF(paciente.cpf)}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">CNS</p>
-                                <p className="font-medium">{paciente.cns}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Data de Nascimento</p>
-                                <p className="font-medium">{formatDate(paciente.dataNascimento)}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Sexo</p>
-                                <p className="font-medium">{paciente.sexo}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Endereço */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5" />
-                                Endereço
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <p>{paciente.endereco.logradouro}, {paciente.endereco.numero}</p>
-                            <p>{paciente.endereco.bairro} - {paciente.endereco.cidade}/{paciente.endereco.estado}</p>
-                            <p>CEP: {paciente.endereco.cep}</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Contato e Risco */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Phone className="w-5 h-5" />
-                                Contato e Risco
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-muted-foreground" />
-                                <span>{formatTelefone(paciente.telefone)}</span>
-                            </div>
-                            {paciente.email && (
-                                <div className="flex items-center gap-2">
-                                    <Mail className="w-4 h-4 text-muted-foreground" />
-                                    <span>{paciente.email}</span>
-                                </div>
-                            )}
-                            <div>
-                                <p className="text-sm text-muted-foreground mb-2">Grupos de Risco</p>
-                                {paciente.gruposRisco.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {paciente.gruposRisco.map((g) => (
-                                            <Badge key={g} variant="destructive">
-                                                {g}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <span className="text-muted-foreground">Nenhum</span>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Histórico */}
-                <div className="space-y-8">
-                    <section>
-                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-red-600" />
-                            Triagens ({historico?.triagens?.length || 0})
-                        </h2>
-                        {historico?.triagens?.length === 0 ? (
-                            <p className="text-muted-foreground">Nenhuma triagem registrada</p>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {historico.triagens.slice(0, 4).map((t: any) => (
-                                    <Card key={t.id}>
-                                        <CardContent className="pt-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <Badge variant={t.nivel_gravidade === 'VERMELHO' ? 'destructive' : 'default'}>
-                                                    {t.nivel_gravidade}
-                                                </Badge>
-                                                <span className="text-sm text-muted-foreground">{formatDate(t.createdAt)}</span>
-                                            </div>
-                                            <p className="font-medium">Queixa: {t.queixa_principal}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-blue-600" />
-                            Consultas ({historico?.consultas?.length || 0})
-                        </h2>
-                        {historico?.consultas?.length === 0 ? (
-                            <p className="text-muted-foreground">Nenhuma consulta registrada</p>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {historico.consultas.slice(0, 4).map((c: any) => (
-                                    <Card key={c.id}>
-                                        <CardContent className="pt-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm text-muted-foreground">{formatDate(c.dataConsulta)}</span>
-                                            </div>
-                                            <p className="font-medium">Motivo: {c.motivoConsulta}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-green-600" />
-                            Prescrições ({historico?.prescricoes?.length || 0})
-                        </h2>
-                        {historico?.prescricoes?.length === 0 ? (
-                            <p className="text-muted-foreground">Nenhuma prescrição registrada</p>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {historico.prescricoes.slice(0, 4).map((p: any) => (
-                                    <Card key={p.id}>
-                                        <CardContent className="pt-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm text-muted-foreground">{formatDate(p.dataPrescricao)}</span>
-                                            </div>
-                                            <p className="font-medium">Médico: {p.medicoNome}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-
-                    <section>
-                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-purple-600" />
-                            Prontuários ({historico?.prontuarios?.length || 0})
-                        </h2>
-                        {historico?.prontuarios?.length === 0 ? (
-                            <p className="text-muted-foreground">Nenhum prontuário registrado</p>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {historico.prontuarios.slice(0, 4).map((pr: any) => (
-                                    <Card key={pr.id}>
-                                        <CardContent className="pt-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm text-muted-foreground">{formatDate(pr.createdAt)}</span>
-                                            </div>
-                                            <p className="font-medium">Descrição: {pr.descricao}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </section>
+    if (isLoading) {
+        return (
+            <div className="space-y-10 pb-12">
+                <Header title="Carregando paciente..." />
+                <div className="space-y-6">
+                    <Skeleton className="h-12 w-96 rounded-xl" />
+                    <Skeleton className="h-64 w-full rounded-xl" />
+                    <Skeleton className="h-48 w-full rounded-xl" />
                 </div>
             </div>
-        </RequireRole>
+        );
+    }
+
+    if (isError || !paciente) {
+        return (
+            <div className="space-y-10 pb-12">
+                <Header title="Paciente não encontrado" />
+                <Card className="border-red-200 bg-red-50">
+                    <CardContent className="pt-10 text-center">
+                        <p className="text-xl mb-8">Não foi possível carregar os dados do paciente.</p>
+                        <Link href="/dashboard/pacientes">
+                            <Button variant="outline" size="lg">
+                                <ArrowLeft className="mr-2 h-5 w-5" />
+                                Voltar para lista
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-10 pb-12">
+            <Header
+                title={paciente.nome}
+                description={`CPF: ${formatCPF(paciente.cpf)}`}
+                actionLabel="Voltar"
+                actionHref="/dashboard/pacientes"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Informações Pessoais</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Nome completo</p>
+                            <p className="text-lg font-medium">{paciente.nome}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Data de nascimento</p>
+                            <p className="text-lg font-medium">{formatDate(paciente.dataNascimento)}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">CPF</p>
+                            <p className="font-mono text-lg">{formatCPF(paciente.cpf)}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">CNS</p>
+                            <p className="font-mono text-lg">{paciente.cns || '—'}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Contato</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Telefone</p>
+                            <p className="text-lg font-medium">{formatTelefone(paciente.telefone)}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Email</p>
+                            <p className="text-lg font-medium">{paciente.email || '—'}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Endereço</p>
+                            <p className="text-lg font-medium">
+                                {`${paciente.endereco.logradouro}, ${paciente.endereco.numero}, ${paciente.endereco.bairro}, ${paciente.endereco.cidade} - ${paciente.endereco.estado}, ${paciente.endereco.cep}`}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="md:col-span-2">
+                    <CardHeader>
+                        <CardTitle>Grupos de Risco</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {paciente.gruposRisco.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                                {paciente.gruposRisco.map((grupo) => (
+                                    <Badge key={grupo} variant="secondary">
+                                        {grupo}
+                                    </Badge>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground">Nenhum grupo de risco cadastrado</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className="flex justify-end gap-4">
+                <Link href={`/dashboard/pacientes/${id}/editar`}>
+                    <Button>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar Paciente
+                    </Button>
+                </Link>
+            </div>
+        </div>
     );
 }
