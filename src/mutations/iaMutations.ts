@@ -9,7 +9,7 @@ export const useGerarSurtoMutation = () => {
     return useMutation({
         mutationFn: iaService.gerarSurto,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios });
+            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios() });
         },
     });
 };
@@ -20,7 +20,7 @@ export const useAnalisarRecorrenteMutation = () => {
     return useMutation({
         mutationFn: iaService.analisarRecorrente,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios });
+            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios() });
         },
     });
 };
@@ -31,7 +31,7 @@ export const useGerarTriagensMutation = () => {
     return useMutation({
         mutationFn: iaService.gerarTriagens,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios });
+            queryClient.invalidateQueries({ queryKey: iaKeys.relatorios() });
         },
     });
 };

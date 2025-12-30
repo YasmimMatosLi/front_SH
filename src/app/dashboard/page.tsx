@@ -16,7 +16,7 @@ export default function DashboardPage() {
     const { data: pacientes, isLoading: loadingPacientes } = usePacientes();
     const { data: consultas, isLoading: loadingConsultas } = useConsultas();
     const { data: triagens, isLoading: loadingTriagens } = useTriagens();
-    const { data: relatorios, isLoading: loadingRelatorios } = useRelatoriosIA(1);
+    const { data: relatoriosArray, isLoading: loadingRelatorios } = useRelatoriosIA(1);
 
     const totalPacientes = pacientes?.length ?? 0;
     const consultasHoje = consultas?.filter(c => {
@@ -26,7 +26,7 @@ export default function DashboardPage() {
     }).length ?? 0;
 
     const triagensCriticas = triagens?.filter(t => ['VERMELHO', 'LARANJA'].includes(t.nivel_gravidade)).length ?? 0;
-    const ultimoRelatorio = relatorios?.[0];
+    const ultimoRelatorio = relatoriosArray?.[0];
 
     const isLoading = loadingPacientes || loadingConsultas || loadingTriagens || loadingRelatorios;
 

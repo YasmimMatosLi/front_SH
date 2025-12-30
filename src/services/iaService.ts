@@ -1,16 +1,17 @@
-// src/services/iaService.ts
 import { apiFetch } from '@/lib/api';
-import { RelatorioIA } from '@/types';
+import { RelatorioIAResponse, RelatoriosIAResponse, RelatorioIAItem } from '@/types/relatorio-ia';
 
 export const iaService = {
-    gerarSurto: (unidadeSaudeId?: string): Promise<string> => {
+    gerarSurto: (unidadeSaudeId?: string): Promise<RelatorioIAItem> => {
         const params = unidadeSaudeId ? `?unidade_saude_id=${unidadeSaudeId}` : '';
-        return apiFetch(`/ia/surto${params}`) as Promise<string>;
+        return apiFetch(`/ia/surto${params}`) as Promise<RelatorioIAItem>;
     },
-    analisarRecorrente: (pacienteId: string): Promise<string> =>
-        apiFetch(`/ia/paciente/${pacienteId}/recorrente`) as Promise<string>,
-    gerarTriagens: (unidadeSaudeId: string): Promise<string> =>
-        apiFetch(`/ia/triagens/${unidadeSaudeId}`) as Promise<string>,
-    getRelatorios: (limit = 20): Promise<RelatorioIA[]> =>
-        apiFetch(`/ia/relatorios?limit=${limit}`) as Promise<RelatorioIA[]>,
+    analisarRecorrente: (pacienteId: string): Promise<RelatorioIAItem> =>
+        apiFetch(`/ia/paciente/${pacienteId}/recorrente`) as Promise<RelatorioIAItem>,
+    gerarTriagens: (unidadeSaudeId: string): Promise<RelatorioIAItem> =>
+        apiFetch(`/ia/triagens/${unidadeSaudeId}`) as Promise<RelatorioIAItem>,
+    getRelatorios: (limit = 20): Promise<RelatoriosIAResponse> =>
+        apiFetch(`/ia/relatorios?limit=${limit}`),
+    getRelatorioById: (id: string): Promise<RelatorioIAResponse> =>
+        apiFetch(`/ia/relatorios/${id}`),
 };
